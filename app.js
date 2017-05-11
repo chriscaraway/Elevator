@@ -2,16 +2,55 @@ const Elevator = require("./elevator");
 const Passenger = require('./passenger');
 
 const elevator = new Elevator();
-const passenger = new Passenger("Will", 1);
-const passenger = new Passenger("Chris", 2);
-const passenger = new Passenger("Molly", 3);
+let passengers = [
+	new Passenger("Peter", 3),
+	new Passenger("Paul", 2),
+	new Passenger("Mary", 1),
+];
 
-elevator.loadPassenger(passenger);
+let name = Passenger.name;
+let floor = Passenger.floor;
 
-console.log(elevator);
-console.log(passenger);
+function loadElevator() {
+	elevator.loadPasenger(passengers.pop());
+}
 
+function unloadElevator() {
+	elevator.unloadPassenger();
+}
 
-elevator.unloadPassenger();
+elevator.on("up", function(event) {
+	console.log("This is floor " + event.currentFloor);
+	if (event.currentFloor < elevator.currentPassenger.floor) {
+		console.log(elevator.currentPassenger.name + " is going up.");
+	}
+	if (event.currentFloor === elevator.currentPassenger.floor) {
+		console.log("This is " + elevator.currentPassenger.name + "'s floor.");
+		unloadElevator();
+		elevator.goDown();
+	}
 
-console.log(elevator.currentPassenger);
+	else {
+		elevator.goUp();
+	}
+});
+
+elevator.on("down", function(event) {
+	if (event.currentFloor !== 0) {
+		elevator.goDown();
+	}
+
+	if (passengers.length > 0 && event.currentFloor === 0) {
+		loadElevator();
+		console.log(elevator.currentPassenger.name + " is in the elevator.");
+		elevator.goUp();
+	}
+
+	if (passengers.length === 0 && event.currentFloor === 0) {
+		loadElevator();
+		console.log("Elevator is ready!");
+	}
+});
+
+loadElevator();
+elevator.goUp();

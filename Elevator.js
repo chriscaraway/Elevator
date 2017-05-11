@@ -6,51 +6,52 @@ class Elevator extends EventEmitter {
 		super();
 		this.currentPassenger = null;
 		this.currentFloor = 0;
-		this.isMoving = false;
 	}
 
 	loadPassenger(passenger) {
+		if (this.currentPassenger) {
+			console.error("Passenger" + passenger.name + "is occuppying the elevator");
+			return;
+		}
+
 		this.currentPassenger = passenger;
-		throw new Error("passenger " + passenger.name + " is occupying the elevator");
-		//console.erro("Passneger " + passenger.name " is occupying the elevator")
-		//return;
+
 	}
+
 	unloadPassenger() {
 		if (!this.currentPassenger) {
 			console.error("No passenger to unload!");
 			return;
 		}
-
 		this.currentPassenger = null;
 
 	}
 
-goUp() {
-	this._move(1)
-	}
+	_move(moveType, floorChange) {
 
-goDown() {
-	this._move(-1)
-
-}
-
-_move(moveType, floorChage) {
-	if(this.isMoving) {
-		console.error("Elevator is already moving!");
-		return;
-	}
+		if(this.isMoving) {
+			console.error("Elevator is already moving!");
+			return;
+		}
 
 	this.isMoving = true;
 
 	setTimeout(function() {
 		this.isMoving = false;
-		this.currentFloor+= floorChage;
-		this.emit("up", {
+		this.currentFloor+= floorChange;
+		this.emit(moveType, {
 			currrentPassenger: this.currentPassenger,
 			currentFloor: this.currentFloor,
 		});
 	}.bind(this), 1000);
 }
+
+	goUp() {
+		this._move("up", 1);
+		this._move("down", -1);
+
+	}
+
 }
 
 
